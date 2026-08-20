@@ -136,7 +136,7 @@ jobs:
       - name: Upload Release-APK
         uses: actions/upload-artifact@v4
         with:
-          name: secureguard-pro.apk
+          name: wischiwaschi-pro.apk
           path: ${{ steps.find-apk.outputs.apk_path }}
           retention-days: 60                    # Release deutlich länger verfügbar
 

@@ -32,7 +32,7 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: secureguard-pro.apk
+          name: wischiwaschi-pro.apk
           path: dist/*.apk
           retention-days: 30
 
@@ -40,14 +40,14 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          name: "🛡️ SecureGuard Pro (Docker Build) ${{ github.ref_name }}"
+          name: "🛡️ wischiwaschi Pro (Docker Build) ${{ github.ref_name }}"
           body: |
-            ## 🛡️ SecureGuard Enterprise (Docker-Build)
+            ## 🛡️ wischiwaschi (Docker-Build)
 
             Diese Variante wurde via Docker-Compose reproduzierbar gebaut.
 
             ### 📦 Download
-            - **APK**: secureguard-pro.apk
+            - **APK**: wischiwaschi-pro.apk
           files: |
             dist/*.apk
           draft: false

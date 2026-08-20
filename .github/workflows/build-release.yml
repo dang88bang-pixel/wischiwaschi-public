@@ -75,7 +75,7 @@ jobs:
       - name: Upload APK als Artifact (Vor-Release-Check)
         uses: actions/upload-artifact@v4
         with:
-          name: secureguard-pro-${{ github.ref_name }}.apk
+          name: wischiwaschi-pro-${{ github.ref_name }}.apk
           path: ${{ steps.find-apk.outputs.apk_path }}
           retention-days: 90
 
@@ -88,7 +88,7 @@ jobs:
       - name: Download APK
         uses: actions/download-artifact@v4
         with:
-          name: secureguard-pro-${{ github.ref_name }}.apk
+          name: wischiwaschi-pro-${{ github.ref_name }}.apk
           path: ./apk
 
       - name: Build-Info sammeln
@@ -111,9 +111,9 @@ jobs:
       - name: GitHub Release erstellen
         uses: softprops/action-gh-release@v2
         with:
-          name: "🛡️ SecureGuard Pro ${{ github.ref_name }}"
+          name: "🛡️ wischiwaschi Pro ${{ github.ref_name }}"
           body: |
-            ## 🛡️ SecureGuard Enterprise — ${{ github.ref_name }}
+            ## 🛡️ wischiwaschi — ${{ github.ref_name }}
 
             **Build:**   ${{ github.workflow }} · ${{ github.run_id }}  
             **Commit:**  ${{ github.sha }}  
@@ -135,11 +135,11 @@ jobs:
             - 📧 Temporäre E-Mail / OTP-Registrierung (MCP + REST)
 
             ### 📦 Downloads
-            - **APK**: `secureguard-pro-${{ github.ref_name }}.apk`
+            - **APK**: `wischiwaschi-pro-${{ github.ref_name }}.apk`
 
             ### 📋 Installation
             ```
-            adb install -r secureguard-pro-${{ github.ref_name }}.apk
+            adb install -r wischiwaschi-pro-${{ github.ref_name }}.apk
             adb shell am start -n com.secureguard.enterprise/.presentation.MainActivity
             ```
 
