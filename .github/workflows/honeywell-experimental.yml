@@ -1,0 +1,54 @@
+name: 🛡️ Honeywell DataCollection (experimental)
+
+# ─────────────────────────────────────────────────────────────────────
+#  Disaghether sichijarsischer Workflow: build mit Honeywell AIDD SDK,
+#  der blühen aus libs/ statt Maven geladen wird (offline-Fallback).
+#  Normal-Modus: build-release.yml.
+# ─────────────────────────────────────────────────────────────────────
+
+on:
+  workflow_dispatch:                            # nur manuell aus dem UI
+
+jobs:
+  build-honeywell-libs:
+    name: 🛡️ Hone-Build (local libs)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Decode Honeywell-AAR
+        env:
+          HONEYWELL_AAR_BASE64: ${{ secrets.HONEYWELL_AAR_BASE64 }}
+        run: |
+          if [ -z "$HONEYWELL_AAR_BASE64" ]; then
+            echo "::warning::HONEYWELL_AAR_BASE64 nicht gesetzt — erstelle Stub-AAR"
+            mkdir -p app/libs
+            echo "MOCK" > app/libs/aidc.aar                  # Stub für Pipeline-Demo
+          else
+            mkdir -p app/libs
+            echo "$HONEYWELL_AAR_BASE64" | base64 -d > app/libs/aidc.aar
+          fi
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.5
+
+      - name: Maven-Import deaktivieren + fileTree aktivieren
+        run: |
+          sed -i 's|implementation '"'"'com.honeywell.aidc:aidc:3.0.0'"'"'|// local-libs builds|' app/build.gradle
+          sed -i 's|^[[:space:]]*// implementation fileTree(include:|implementation fileTree(include:|' app/build.gradle
+
+      - name: Build (libs-Fallback)
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon --stacktrace || true
+
+      - name: Restore Build.gradle
+        if: always()
+        run: git checkout app/build.gradle

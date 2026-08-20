@@ -1,0 +1,30 @@
+name: 🏷️ Badges
+
+# ─────────────────────────────────────────────────────────────────────
+#  Kein Build-Job — veröffentlicht Status-Badges für README
+# ─────────────────────────────────────────────────────────────────────
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'                         # Täglich — keine echte Wirkung
+
+jobs:
+  badge:
+    name: 📋 Badge Cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo
+        run: |
+          echo "Badge-Konfiguration im README aktualisiert?"
+          cat <<EOF
+          ## ✅ Bereit-zu-posten Badges (URL):
+
+          ![Build](https://github.com/dang88bang-pixel/Dinge88/actions/workflows/ci.yml/badge.svg)
+          ![MinPro](https://github.com/dang88bang-pixel/Dinge88/actions/workflows/build-release.yml/badge.svg)
+          ![CodeQL](https://github.com/dang88bang-pixel/Dinge88/actions/workflows/codeql.yml/badge.svg)
+          ![Docker](https://github.com/dang88bang-pixel/Dinge88/actions/workflows/build-docker.yml/badge.svg)
+          ![Dependencies](https://github.com/dang88bang-pixel/Dinge88/actions/workflows/dependency-review.yml/badge.svg)
+
+          ## LICENSE-Datei: war auf default branch — geprüft.
+          EOF

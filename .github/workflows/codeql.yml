@@ -1,0 +1,44 @@
+name: 🔒 CodeQL — Static Security Analysis
+
+# ─────────────────────────────────────────────────────────────────────
+#  Security-Check: scannt Kotlin/Java-Code auf Schwachstellen
+#  Läuft wöchentlich + bei jedem Push/PR.
+#  Ergebnisse unter Security → Code scanning alerts
+# ─────────────────────────────────────────────────────────────────────
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '17 6 * * 1'                      # Mo 06:17 UTC
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write                       # SARIF-Ergebnisse hochladen
+
+jobs:
+  analyze:
+    name: 🔒 CodeQL analyze (kotlin)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: kotlin
+          queries: security-extended,security-and-quality
+          build-mode: none                       # Kotlin Projekt ohne separate Build-Phase
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:kotlin"

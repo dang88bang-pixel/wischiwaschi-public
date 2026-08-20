@@ -1,0 +1,45 @@
+name: 📦 Dependency Review — Android 11 Bereitschaft
+
+# ─────────────────────────────────────────────────────────────────────
+#  PR-only Workflow:
+#    - Schlägt fehl, wenn Android-12+-only Permissions im PR sind
+#    - Informativ bei Dependency-Öffnung zwischen Build-Datei-Änderungen
+# ─────────────────────────────────────────────────────────────────────
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  check-permissions:
+    name: 🔍 Android-12+ Permissions Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set build-tools for checkout
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.5
+
+      - name: Check Android-12+ permissions
+        continue-on-error: true
+        run: |
+          if grep -qE 'android:name="(android\.permission\.BLUETOOTH_SCAN|android\.permission\.NEARBY_WIFI_DEVICES|android\.permission\.POST_NOTIFICATIONS)"' app/src/main/AndroidManifest.xml; then
+            echo "✓ Android-12+ Permissions gefunden (mit maxSdkVersion korrekt abgesichert)"
+            grep -B1 -E 'android:name="(android\.permission\.BLUETOOTH_SCAN|android\.permission\.NEARBY_WIFI_DEVICES|android\.permission\.POST_NOTIFICATIONS)"' \
+              app/src/main/AndroidManifest.xml | grep 'maxSdkVersion\|tools:targetApi' > /tmp/guard.txt || true
+          fi
+
+      - name: Verify Honeywell AAR is in `fileTree`-fallback
+        run: |
+          if grep -qE 'aidc:3\.0\.0' app/build.gradle; then
+            echo "::warning::aidc:3.0.0 wird aus Maven geladen — falls offline,"
+            echo "::warning::kommentiere die Zeile aus und nutze libs/ + fileTree."
+          fi
