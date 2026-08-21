@@ -10,9 +10,25 @@ Asset-Tracking & Sicherheits-App für Android 11+ (Zielgerät: Honeywell CT45P).
 ## 📦 Lokal bauen
 
 ```bash
-# JDK 17 + Android SDK 34 (Build-Tools 34.0.0) vorausgesetzt
-./gradlew assembleDebug                                  # Debug-APK
+# Toolchain einmalig einrichten (JDK 17 + Android SDK 34 + local.properties):
+make toolchain          # bzw. bash scripts/setup-toolchain.sh
+source toolchain.env    # JAVA_HOME / ANDROID_HOME / PATH
 
+make doctor             # prüft Toolchain + Erreichbarkeit der Download-Quellen
+
+./gradlew assembleDebug                                  # Debug-APK
+```
+
+`make toolchain` lädt Temurin **JDK 17** (kein JRE — `javac` wird gebraucht) und die
+Android **cmdline-tools + platforms;android-34/26 + build-tools;34.0.0**, akzeptiert die
+Lizenzen und schreibt `sdk.dir` nach `local.properties`.
+
+> **Gesperrtes Netz?** Der Build braucht `dl.google.com`, `repo.maven.apache.org` und
+> `services.gradle.org`. Sind die geblockt (Sandbox/Corporate-Proxy), meldet das
+> `make doctor` sofort. Fallbacks: `make docker-build` (Dockerfile bringt die komplette
+> Toolchain mit) oder Pull Request öffnen → CI baut auf GitHub-Runnern.
+
+```bash
 # Release (signiert):
 KEYSTORE_PASSWORD=... KEY_ALIAS=secureguard KEY_PASSWORD=... \
 ./gradlew assembleRelease                                # → app/build/outputs/apk/release/
