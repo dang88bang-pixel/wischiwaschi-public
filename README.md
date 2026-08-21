@@ -59,6 +59,19 @@ Workflow **„🚀 MinPro / Release — APK Sign & Publish"** (`build-release.ym
 
 3. **Ergebnis:** GitHub-Release `v1.0.0` mit Asset **`secureguard-pro-v1.0.0.apk`** (~5–8 min).
 
+## 🔧 CI reparieren (einmalig nötig)
+
+Die Workflows enthalten einen ungültigen Permissions-Scope (`artifacts: write`) und
+weitere Defekte — dadurch endet **jeder** Actions-Lauf sofort als `startup_failure`,
+die Badges oben sind entsprechend nichts wert. Fix:
+
+```bash
+bash scripts/fix-workflows.sh     # oder: git apply docs/ci-repair.patch
+git add .github/workflows && git commit -m "ci: Workflows reparieren" && git push
+```
+
+Details zu allen neun Defekten: [`docs/CI-REPARATUR.md`](docs/CI-REPARATUR.md).
+
 ## 🧪 CI-Checks
 
 | Workflow | Wann | Inhalt |
