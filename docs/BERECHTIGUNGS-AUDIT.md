@@ -98,3 +98,40 @@ sind ohne Wirkung. Entweder entfernen oder den fehlenden Foreground-Service/Rece
 1. **B5** (Funktionsfehler auf dem Zielgerät) und **B6** (Foreground-Service fehlt komplett)
 2. **B1**, **B3** (Store-/Datenschutz-Risiko)
 3. **B2**, **B4**, Kleinere Punkte (Hygiene)
+
+---
+
+## Nachtrag: Build-/CI-Verifikation (21.08.2026)
+
+**Lokaler Build nicht möglich.** Die Arbeitsumgebung erreicht weder `dl.google.com`
+(Android SDK, Google Maven) noch `repo.maven.apache.org` oder `services.gradle.org`.
+Ohne diese Quellen gibt es kein `android.jar`, keine AGP/Compose-Artefakte und keine
+Gradle-Distribution — `./gradlew compileDebugKotlin` kann dort prinzipiell nicht laufen.
+`make doctor` (neu) meldet genau das in zwei Sekunden statt nach zehn Minuten Timeout.
+
+**CI konnte es ebenfalls nicht verifizieren — aus einem eigenständigen Bug:**
+`.github/workflows/ci.yml` deklariert
+
+```yaml
+permissions:
+  artifacts: write     # ← existiert nicht
+```
+
+`artifacts` ist **kein gültiger GitHub-Permissions-Scope**. Dadurch ist die komplette
+Workflow-Datei ungültig und jeder Lauf endet sofort als `startup_failure` —
+auch auf `main`. Die grünen Badges im README täuschen: die CI hat faktisch nie gebaut.
+
+**Fix (ein Zeilen-Delete), muss von Hand erfolgen** — der Agent-Token dieses Branches
+hat keine `workflows`-Berechtigung und darf Workflow-Dateien nicht pushen:
+
+```diff
+ permissions:
+   contents: read
+   packages: read
+   actions: read
+-  artifacts: write
+```
+
+`actions/upload-artifact` braucht keinen eigenen Scope. Danach laufen Lint, Unit-Tests
+und der Debug-/Release-Build durch und verifizieren die Permission-Änderungen aus diesem
+Branch.
